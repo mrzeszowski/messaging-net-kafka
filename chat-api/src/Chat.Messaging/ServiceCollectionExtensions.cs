@@ -21,6 +21,8 @@ public static class ServiceCollectionExtensions
         services.AddKeyedSingleton<IDistributedLockProvider>(nameof(EventForwarderBackgroundService), new PostgresDistributedSynchronizationProvider(connectionString!));
         services.AddHostedService<EventForwarderBackgroundService>();
         
+        services.Configure<KafkaOptions>(configuration.GetSection("Kafka"));
+
         return services;
     }
 }

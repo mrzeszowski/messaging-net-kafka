@@ -40,6 +40,79 @@ namespace Chat.Api.Migrations
                     b.ToTable("Message", "chat");
                 });
 
+            modelBuilder.Entity("Chat.Messaging.Ef.EventLog", b =>
+                {
+                    b.Property<long>("LocalOffset")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<byte[]>("PartitionKey")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<byte[]>("Payload")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("LocalOffset");
+
+                    b.HasIndex("Topic");
+
+                    b.HasIndex("Type");
+
+                    b.HasIndex("Type", "PartitionKey");
+
+                    b.ToTable("EventLog", "chat");
+                });
+
+            modelBuilder.Entity("Chat.Messaging.Ef.EventOutbox", b =>
+                {
+                    b.Property<long>("LocalOffset")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("LocalOffset"));
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<byte[]>("PartitionKey")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<byte[]>("Payload")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("LocalOffset");
+
+                    b.ToTable("EventOutbox", "chat");
+                });
+
             modelBuilder.Entity("Chat.Api.Message", b =>
                 {
                     b.OwnsOne("Chat.Api.User", "Sender", b1 =>

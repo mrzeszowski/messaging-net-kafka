@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Retry;
@@ -36,7 +37,6 @@ public class ApiFixture : IAsyncLifetime
     {
         await _postgres.StartAsync();
         await _kafka.StartAsync();
-
 
         _factory = new WebApplicationFactory<Api.Program>().WithWebHostBuilder(builder =>
         {

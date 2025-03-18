@@ -1,3 +1,6 @@
+using System.Globalization;
+using NodaTime;
+
 namespace Chat.Api;
 
 internal class Message
@@ -16,6 +19,8 @@ internal class Message
     public string Text { get; }
     public User Sender { get; }
     public long Timestamp { get; }
+    
+    public string CreatedAt => Instant.FromUnixTimeTicks(Timestamp).ToDateTimeUtc().ToString("dd MMMM yyyy HH:mm", CultureInfo.CurrentCulture);
 }
 
 internal record User(string Name, string Email);

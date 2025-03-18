@@ -18,6 +18,7 @@ type Message = {
   id: string;
   text: string;
   sender: Sender;
+  createdAt: string;
 };
 
 type User = {
@@ -69,11 +70,12 @@ export default function ChatUi() {
     const request = { text: input, sender: { name: user.name, email: user.email } };
 
     try {
-      const response = await axios.post("/api/v1/messages", request);
-      const locationHeader = response.headers.location;
-      const id = locationHeader.split("/").pop();
-      const message = { ...request, id: id };
-      setMessages([...messages, message]);
+      await axios.post("/api/v1/messages", request);
+      // const response = await axios.post("/api/v1/messages", request);
+      // const locationHeader = response.headers.location;
+      // const id = locationHeader.split("/").pop();
+      // const message = { ...request, id: id };
+      // setMessages([...messages, message]);
       setInput("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -177,7 +179,7 @@ export default function ChatUi() {
           <div className="overflow-y-auto max-h-[calc(100%-120px)] space-y-2 flex-grow">
             {messages.map((msg) => (
               <div key={`${msg.id}`} className="mb-4">
-                <div className={`flex w-max flex-col gap-2 text-xs text-gray-400 mb-2 ${msg.sender.email === user.email ? "self-end ml-auto" : ""}`}>{msg.sender.email} | 2025/02/23 16:14</div>
+                <div className={`flex w-max flex-col gap-2 text-xs text-gray-400 mb-2 ${msg.sender.email === user.email ? "self-end ml-auto" : ""}`}>{msg.sender.email} | {msg.createdAt}</div>
                 <div className={`flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm 
                 ${msg.sender.email === user.email ? "bg-primary self-end ml-auto text-primary-foreground" : "bg-muted"}`}>
                   {msg.text}

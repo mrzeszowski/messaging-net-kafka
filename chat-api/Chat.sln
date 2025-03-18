@@ -2,6 +2,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Api", "src\Chat.Api\Chat.Api.csproj", "{9150E98E-F816-438E-A0D4-6342B091C406}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{17EDA146-A0C5-447B-AB1C-07218E1C6620}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4C281A30-70C1-46E3-9172-D80C53005158}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Integration.Tests", "tests\Chat.Integration.Tests\Chat.Integration.Tests.csproj", "{B66FB983-F10F-4435-AA35-EAC739D0685B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +18,13 @@ Global
 		{9150E98E-F816-438E-A0D4-6342B091C406}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9150E98E-F816-438E-A0D4-6342B091C406}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9150E98E-F816-438E-A0D4-6342B091C406}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B66FB983-F10F-4435-AA35-EAC739D0685B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B66FB983-F10F-4435-AA35-EAC739D0685B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B66FB983-F10F-4435-AA35-EAC739D0685B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B66FB983-F10F-4435-AA35-EAC739D0685B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9150E98E-F816-438E-A0D4-6342B091C406} = {17EDA146-A0C5-447B-AB1C-07218E1C6620}
+		{B66FB983-F10F-4435-AA35-EAC739D0685B} = {4C281A30-70C1-46E3-9172-D80C53005158}
 	EndGlobalSection
 EndGlobal

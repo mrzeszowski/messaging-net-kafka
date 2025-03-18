@@ -2,6 +2,7 @@ using Chat.Api;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<ChatDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ChatDb")));
+builder.Services.TryAddScoped<DbContext>(sp => sp.GetRequiredService<ChatDbContext>());
 
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
@@ -35,7 +37,7 @@ app.UseRouting();
 
 app.UseCors("ChatUi");
 
-app.MapPost("/api/v1/messages", async (ChatDbContext db, MessageDto dto, IValidator<MessageDto> validator, IHubContext<ChatHub> hubContext) =>
+app.MapPost("/api/v1/messages", async (ChatDbContext db, MessageDto dto, IValidator<MessageDto> validator, IHubContext<ChatHub> hubContext, CancellationToken cancellationToken) =>
 {
     var validationResult = await validator.ValidateAsync(dto);
     if (!validationResult.IsValid)
@@ -51,15 +53,24 @@ app.MapPost("/api/v1/messages", async (ChatDbContext db, MessageDto dto, IValida
     db.Set<Message>().Add(message);
     await db.SaveChangesAsync();
 
+    await hubContext.Clients.All.SendAsync("Subscribe", message, cancellationToken);
+
     return Results.Created($"/api/v1/messages/{message.Id}", null);
 });
 
 app.MapGet("/api/v1/messages", async (ChatDbContext db) =>
 {
-    var items = await db.Set<Message>().OrderBy(x => x.Timestamp).Take(20).ToListAsync();
+    var items = await db.Set<Message>().OrderByDescending(x => x.Timestamp).Take(20)
+        .OrderBy(x => x.Timestamp)
+        .ToListAsync();
     return Results.Ok(items);
 });
 
 app.MapHub<ChatHub>("/chat-hub");
 
 app.Run();
+
+namespace Chat.Api
+{
+    public partial class Program;
+}

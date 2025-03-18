@@ -1,5 +1,6 @@
 using Chat.Api;
 using Chat.Messaging;
+using Chat.Messaging.Abstractions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
@@ -31,6 +32,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<MessageDtoValidator>();
 
 builder.Services.AddMessaging<Program>(builder.Configuration);
 
+builder.Services.AddScoped<IEventHandler<MessageSent>, MessageSentHandler>();
+
 var app = builder.Build();
 
 app.UseSwagger();
@@ -40,7 +43,7 @@ app.UseRouting();
 
 app.UseCors("ChatUi");
 
-app.MapPost("/api/v1/messages", async (ChatDbContext db, MessageDto dto, IValidator<MessageDto> validator, IHubContext<ChatHub> hubContext, IEventPublisher publisher, CancellationToken cancellationToken) =>
+app.MapPost("/api/v1/messages", async (ChatDbContext db, MessageDto dto, IValidator<MessageDto> validator, IEventPublisher publisher, CancellationToken cancellationToken) =>
 {
     var validationResult = await validator.ValidateAsync(dto);
     if (!validationResult.IsValid)
@@ -53,7 +56,7 @@ app.MapPost("/api/v1/messages", async (ChatDbContext db, MessageDto dto, IValida
         sender: new User(dto.Sender.Name, dto.Sender.Email),
         timestamp: SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks());
     
-    await db.Set<Message>().AddAsync(message, cancellationToken);
+    // await db.Set<Message>().AddAsync(message, cancellationToken);
     
     await publisher.PublishAsync(new MessageSent(id: message.Id,
         data: new MessageSent.MessageDto(Text: message.Text,
@@ -61,8 +64,6 @@ app.MapPost("/api/v1/messages", async (ChatDbContext db, MessageDto dto, IValida
             Timestamp: message.Timestamp)), cancellationToken);
     
     await db.SaveChangesAsync(cancellationToken);
-
-    await hubContext.Clients.All.SendAsync("Subscribe", message, cancellationToken);
     
     return Results.Created($"/api/v1/messages/{message.Id}", null);
 });

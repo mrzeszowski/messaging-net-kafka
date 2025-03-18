@@ -19,11 +19,14 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IProducer, KafkaProducer>();
     
+        services.AddSingleton<ConsumerWorkerFactory>();
         services.AddSingleton(_ => new TypeRepository(typeof(TAssembly)));
         services.AddSingleton<MessageProcessor>();
+        services.AddSingleton<ConsumerPool>();
 
         services.AddKeyedSingleton<IDistributedLockProvider>(nameof(EventForwarderBackgroundService), new PostgresDistributedSynchronizationProvider(connectionString!));
         services.AddHostedService<EventForwarderBackgroundService>();
+        services.AddHostedService<EventDispatchingBackgroundService>();
         
         services.Configure<KafkaOptions>(configuration.GetSection("Kafka"));
 

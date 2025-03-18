@@ -17,6 +17,7 @@ internal class KafkaProducer : IProducer
             SaslMechanism = options.Value.SaslMechanism,
             SaslUsername = options.Value.SaslUsername,
             SaslPassword = options.Value.SaslPassword,
+            Acks = Acks.All,
             // Debug = "broker,topic"
         };
         _producer = new ProducerBuilder<byte[], byte[]>(producerConfig).Build();

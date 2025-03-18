@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<ChatDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ChatDb")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 builder.Services.TryAddScoped<DbContext>(sp => sp.GetRequiredService<ChatDbContext>());
 
 builder.Services.AddSignalR();

@@ -43,7 +43,7 @@ public class ApiFixture : IAsyncLifetime
         _factory = new WebApplicationFactory<Api.Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString());
-            builder.UseSetting("Kafka:Broker", _kafka.GetBootstrapAddress());
+            builder.UseSetting("Kafka:BootstrapServers", _kafka.GetBootstrapAddress());
         });
         
         await using (var scope  = _factory.Services.CreateAsyncScope())

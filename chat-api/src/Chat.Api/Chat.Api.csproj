@@ -21,4 +21,8 @@
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.3.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Chat.Messaging\Chat.Messaging.csproj" />
+    </ItemGroup>
+
 </Project>

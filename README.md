@@ -2,9 +2,9 @@
 ## Prerequisites
 Before you start the setup, make sure your environment meets the following requirements:
 
-- Installed .NET version `8.0.406`
-- Installed Docker version `27.5.*`
-- Installed Node.js version `22.14.*`
+- Installed .NET version `10.0.*`
+- Installed Docker version `28.*`
+- Installed Node.js version `22.12+` (or `24.*`)
 - Installed GIT
 - Installed IDE (Visual Studio, Rider, Visual Studio Code)
 

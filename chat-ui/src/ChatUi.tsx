@@ -29,7 +29,10 @@ type User = {
 export default function ChatUi() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [loginForm, setLoginForm] = useState<User>({ name: "", email: "" });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -45,24 +48,40 @@ export default function ChatUi() {
   }, [messages]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    if (!user) return;
 
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUser(user);
-      fetchMessages();
-      startSignalRConnection();
-    }
-  }, []);
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get("/api/v1/messages");
+        setMessages(response.data);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
 
-  const fetchMessages = async () => {
-    try {
-      const response = await axios.get("/api/v1/messages");
-      setMessages(response.data);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  };
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(apiUrl + "/chat-hub")
+      .withAutomaticReconnect()
+      .build();
+
+    connection.on("Subscribe", (message: Message) => {
+      setMessages(prevMessages => {
+        if (!prevMessages.find(msg => msg.id === message.id)) {
+          return [...prevMessages, message];
+        }
+        return prevMessages;
+      });
+    });
+
+    fetchMessages();
+    connection.start()
+      .then(() => console.log("SignalR Connected"))
+      .catch(err => console.error("Error connecting to SignalR", err));
+
+    return () => {
+      connection.stop();
+    };
+  }, [user]);
 
   const sendMessage = async () => {
     if (!input.trim() || !user) return;
@@ -92,8 +111,6 @@ export default function ChatUi() {
     if (loginForm.name.trim() && loginForm.email.trim()) {
       localStorage.setItem("user", JSON.stringify(loginForm));
       setUser(loginForm);
-      fetchMessages();
-      startSignalRConnection();
     }
   };
 
@@ -106,26 +123,6 @@ export default function ChatUi() {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
-  };
-
-  const startSignalRConnection = () => {
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl(apiUrl + "/chat-hub")
-      .withAutomaticReconnect()
-      .build();
-
-    connection.on("Subscribe", (message: Message) => {
-      setMessages(prevMessages => {
-        if (!prevMessages.find(msg => msg.id === message.id)) {
-          return [...prevMessages, message];
-        }
-        return prevMessages;
-      });
-    });
-
-    connection.start()
-      .then(() => console.log("SignalR Connected"))
-      .catch(err => console.error("Error connecting to SignalR", err));
   };
 
   if (!user) {

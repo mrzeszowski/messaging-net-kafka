@@ -10,12 +10,10 @@ namespace Chat.Integration.Tests;
 
 public class ApiFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-        .WithImage("postgres:latest")
+    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:18.6")
         .Build();
 
-    private readonly KafkaContainer _kafka = new KafkaBuilder()
-        .WithImage("confluentinc/cp-kafka:latest")
+    private readonly KafkaContainer _kafka = new KafkaBuilder("confluentinc/cp-kafka:8.3.2")
         .Build();
 
     private WebApplicationFactory<Api.Program>? _factory;
